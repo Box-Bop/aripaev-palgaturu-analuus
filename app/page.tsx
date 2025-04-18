@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { JobCombobox } from "@/app/components/CareerSearchForm";
 
 export default function Home() {
   return (
@@ -8,11 +9,9 @@ export default function Home() {
           Äripaev Palgaruru Analüüs
         </h1>
         <p className="text-lg mb-8">
-          subtext
+          Leia oma ametile sobiv palk
         </p>
-        <Button size="lg">
-          Get Started
-        </Button>
+        <JobCombobox />
       </main>
     </div>
   );

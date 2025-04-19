@@ -32,7 +32,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { Job } from "@/app/lib/types"
-import { fetchJobs } from "@/app/lib/api"
+import { fetchJobs, fetchSalaryData } from "@/app/lib/api"
+import { SalaryChart } from "./SalaryChart"
 
 const FormSchema = z.object({
   job: z.string({
@@ -44,6 +45,7 @@ export function JobCombobox() {
   const [jobs, setJobs] = useState<Job[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [salaryData, setSalaryData] = useState<any>(null)
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -67,13 +69,14 @@ export function JobCombobox() {
   }, [])
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    toast("Selected job:", {
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    })
+    fetchSalaryData(data.job)
+      .then(data => {
+        setSalaryData(data)
+      })
+      .catch(err => {
+        console.error("Error fetching salary data:", err)
+        toast.error("Failed to fetch salary data")
+      })
   }
 
   if (error) {
@@ -81,79 +84,82 @@ export function JobCombobox() {
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <FormField
-          control={form.control}
-          name="job"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>Amet</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      className={cn(
-                        "w-[400px] justify-between",
-                        !field.value && "text-muted-foreground"
-                      )}
-                      disabled={isLoading}
-                    >
-                      <span className="truncate">
-                        {isLoading 
-                          ? "Laeb ameteid..."
-                          : field.value
-                          ? jobs.find((job) => job.value === field.value)?.label
-                          : "Vali amet"}
-                      </span>
-                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-[400px] p-0">
-                  <Command>
-                    <CommandInput
-                      placeholder="Otsi ametit..."
-                      className="h-9"
-                    />
-                    <CommandList>
-                      <CommandEmpty>Ametit ei leitud.</CommandEmpty>
-                      <CommandGroup>
-                        {jobs.map((job) => (
-                          <CommandItem
-                            value={job.label}
-                            key={job.value}
-                            onSelect={() => {
-                              form.setValue("job", job.value)
-                            }}
-                          >
-                            {job.label}
-                            <Check
-                              className={cn(
-                                "ml-auto",
-                                job.value === field.value
-                                  ? "opacity-100"
-                                  : "opacity-0"
-                              )}
-                            />
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-              <FormDescription>
-                Vali amet, mille kohta soovid palgauuringut teha.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button type="submit" disabled={isLoading}>Jätka</Button>
-      </form>
-    </Form>
+    <div className="space-y-6">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <FormField
+            control={form.control}
+            name="job"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>Amet</FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        className={cn(
+                          "w-[400px] justify-between",
+                          !field.value && "text-muted-foreground"
+                        )}
+                        disabled={isLoading}
+                      >
+                        <span className="truncate">
+                          {isLoading 
+                            ? "Laeb ameteid..."
+                            : field.value
+                            ? jobs.find((job) => job.value === field.value)?.label
+                            : "Vali amet"}
+                        </span>
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[400px] p-0">
+                    <Command>
+                      <CommandInput
+                        placeholder="Otsi ametit..."
+                        className="h-9"
+                      />
+                      <CommandList>
+                        <CommandEmpty>Ametit ei leitud.</CommandEmpty>
+                        <CommandGroup>
+                          {jobs.map((job) => (
+                            <CommandItem
+                              value={job.label}
+                              key={job.value}
+                              onSelect={() => {
+                                form.setValue("job", job.value)
+                              }}
+                            >
+                              {job.label}
+                              <Check
+                                className={cn(
+                                  "ml-auto",
+                                  job.value === field.value
+                                    ? "opacity-100"
+                                    : "opacity-0"
+                                )}
+                              />
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+                <FormDescription>
+                  Vali amet, mille kohta soovid palgauuringut teha.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button type="submit" disabled={isLoading}>Jätka</Button>
+        </form>
+      </Form>
+      {salaryData && <SalaryChart data={salaryData} />}
+    </div>
   )
 } 

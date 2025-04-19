@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Check, ChevronsUpDown } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+import { useEffect, useState } from "react"
 
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
@@ -30,18 +31,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-
-// Dummy data - in real app this would come from API
-const jobs = [
-  { label: "Software Developer", value: "dev" },
-  { label: "Project Manager", value: "pm" },
-  { label: "Data Analyst", value: "analyst" },
-  { label: "Marketing Specialist", value: "marketing" },
-  { label: "Sales Representative", value: "sales" },
-  { label: "HR Manager", value: "hr" },
-  { label: "Accountant", value: "accountant" },
-  { label: "Customer Service", value: "cs" },
-] as const
+import { Job } from "@/app/lib/types"
+import { fetchJobs } from "@/app/lib/api"
 
 const FormSchema = z.object({
   job: z.string({
@@ -50,9 +41,30 @@ const FormSchema = z.object({
 })
 
 export function JobCombobox() {
+  const [jobs, setJobs] = useState<Job[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   })
+
+  useEffect(() => {
+    async function loadJobs() {
+      try {
+        const fetchedJobs = await fetchJobs()
+        setJobs(fetchedJobs)
+        setError(null)
+      } catch (err) {
+        setError("Failed to load jobs. Please try again later.")
+        console.error("Error loading jobs:", err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadJobs()
+  }, [])
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     toast("Selected job:", {
@@ -62,6 +74,10 @@ export function JobCombobox() {
         </pre>
       ),
     })
+  }
+
+  if (error) {
+    return <div className="text-destructive">{error}</div>
   }
 
   return (
@@ -80,20 +96,23 @@ export function JobCombobox() {
                       variant="outline"
                       role="combobox"
                       className={cn(
-                        "w-[300px] justify-between",
+                        "w-[400px] justify-between",
                         !field.value && "text-muted-foreground"
                       )}
+                      disabled={isLoading}
                     >
-                      {field.value
-                        ? jobs.find(
-                            (job) => job.value === field.value
-                          )?.label
-                        : "Vali amet"}
-                      <ChevronsUpDown className="opacity-50" />
+                      <span className="truncate">
+                        {isLoading 
+                          ? "Laeb ameteid..."
+                          : field.value
+                          ? jobs.find((job) => job.value === field.value)?.label
+                          : "Vali amet"}
+                      </span>
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
-                <PopoverContent className="w-[300px] p-0">
+                <PopoverContent className="w-[400px] p-0">
                   <Command>
                     <CommandInput
                       placeholder="Otsi ametit..."
@@ -133,7 +152,7 @@ export function JobCombobox() {
             </FormItem>
           )}
         />
-        <Button type="submit">Jätka</Button>
+        <Button type="submit" disabled={isLoading}>Jätka</Button>
       </form>
     </Form>
   )

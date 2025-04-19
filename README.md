@@ -1,3 +1,9 @@
+Occupations API URL: https://estat.stat.ee/codelists/codelist/AK2008ap
+https://andmed.stat.ee/en/stat/majandus__palk-ja-toojeukulu__palk__luhiajastatistika/PA111/table/tableViewLayout2
+https://andmed.stat.ee/api/v1/en/stat/majandus/palk-ja-toojeukulu/palk/aastastatistika/PA101.px
+
+
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 A modern web application built with Next.js and shadcn/ui.

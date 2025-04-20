@@ -34,10 +34,11 @@ import {
 import { Job } from "@/app/lib/types"
 import { fetchJobs, fetchSalaryData } from "@/app/lib/api"
 import { SalaryChart } from "./SalaryChart"
+import { SalaryAnalysis } from "./SalaryAnalysis"
 
 const FormSchema = z.object({
   job: z.string({
-    required_error: "Please select a job.",
+    required_error: "Palun valige amet.",
   }),
 })
 
@@ -159,7 +160,12 @@ export function JobCombobox() {
           <Button type="submit" disabled={isLoading}>Jätka</Button>
         </form>
       </Form>
-      {salaryData && <SalaryChart data={salaryData} />}
+      {salaryData && (
+        <>
+          <SalaryChart data={salaryData} />
+          <SalaryAnalysis data={salaryData} />
+        </>
+      )}
     </div>
   )
 } 

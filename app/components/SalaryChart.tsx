@@ -147,6 +147,26 @@ export function SalaryChart({ data }: SalaryChartProps) {
               strokeWidth={2}
               fill="url(#salaryGradient)"
               dot={{ fill: "var(--color-salary)", r: 4 }}
+              label={{
+                position: 'top',
+                content: (props: any) => {
+                  // Show label for every 4th point
+                  if (props.index % 4 === 0) {
+                    return (
+                      <text
+                        x={props.x}
+                        y={props.y - 10}
+                        fill="var(--muted-foreground)"
+                        textAnchor="middle"
+                        fontSize={12}
+                      >
+                        {props.value}€
+                      </text>
+                    )
+                  }
+                  return null
+                }
+              }}
             />
           </AreaChart>
         </ChartContainer>

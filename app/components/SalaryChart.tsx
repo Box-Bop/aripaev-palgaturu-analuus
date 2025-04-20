@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis, ReferenceLine } from "recharts"
 import {
   Card,
   CardContent,
@@ -48,12 +48,28 @@ export function SalaryChart({ data }: SalaryChartProps) {
   const firstQuarter = chartData[0].quarter
   const lastQuarter = chartData[chartData.length - 1].quarter
 
+  // Get unique years from the data
+  const years = [...new Set(chartData.map(item => 
+    item.quarter.split(' ')[0]
+  ))].sort()
+
+  // Create reference lines for each year
+  const yearLines = years.map(year => {
+    const firstQuarterOfYear = chartData.find(item => 
+      item.quarter.startsWith(year)
+    )
+    return {
+      year,
+      x: firstQuarterOfYear?.quarter
+    }
+  }).filter(line => line.x)
+
   const chartConfig = {
     salary: {
-      label: "Keskmine brutokuupalk (€)",
+      label: "Keskmine brutokuupalk\u2001",
       theme: {
-        light: "hsl(215 50% 23%)",  // Deep blue for light mode
-        dark: "hsl(217 91% 60%)",   // Bright blue for dark mode
+        light: "hsl(215 50% 23%)",
+        dark: "hsl(217 91% 60%)",
       },
     },
   } satisfies ChartConfig
@@ -87,12 +103,28 @@ export function SalaryChart({ data }: SalaryChartProps) {
               </linearGradient>
             </defs>
             <CartesianGrid vertical={false} />
+            {yearLines.map((line) => (
+              <ReferenceLine
+                key={line?.year}
+                x={line?.x}
+                stroke="var(--border)"
+                strokeDasharray="3 3"
+                label={{
+                  value: line?.year,
+                  position: 'bottom',
+                  fill: 'var(--muted-foreground)',
+                  fontSize: 12,
+                  offset: 12,
+                }}
+              />
+            ))}
             <XAxis
               dataKey="quarter"
               tickLine={false}
               axisLine={false}
               tickMargin={8}
               minTickGap={32}
+              tick={false}
             />
             <YAxis
               tickLine={false}
@@ -114,17 +146,7 @@ export function SalaryChart({ data }: SalaryChartProps) {
               stroke="var(--color-salary)"
               strokeWidth={2}
               fill="url(#salaryGradient)"
-              dot={false}
-              name="salary-gradient"
-            />
-            <Area
-              dataKey="salary"
-              type="monotone"
-              stroke="var(--color-salary)"
-              strokeWidth={2}
-              fill="none"
               dot={{ fill: "var(--color-salary)", r: 4 }}
-              name="salary-dots"
             />
           </AreaChart>
         </ChartContainer>

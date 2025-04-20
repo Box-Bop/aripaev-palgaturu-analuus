@@ -35,6 +35,7 @@ import { Job } from "@/app/lib/types"
 import { fetchJobs, fetchSalaryData } from "@/app/lib/api"
 import { SalaryChart } from "./SalaryChart"
 import { SalaryAnalysis } from "./SalaryAnalysis"
+import { SalaryMetrics } from "./SalaryMetrics"
 
 const FormSchema = z.object({
   job: z.string({
@@ -164,6 +165,7 @@ export function JobCombobox() {
         <>
           <SalaryChart data={salaryData} />
           <SalaryAnalysis data={salaryData} />
+          <SalaryMetrics data={salaryData} />
         </>
       )}
     </div>

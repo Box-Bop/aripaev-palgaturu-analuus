@@ -93,8 +93,7 @@ export function JobCombobox() {
             control={form.control}
             name="job"
             render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Amet</FormLabel>
+              <FormItem className="flex flex-col items-center">
                 <Popover>
                   <PopoverTrigger asChild>
                     <FormControl>
@@ -151,7 +150,7 @@ export function JobCombobox() {
                     </Command>
                   </PopoverContent>
                 </Popover>
-                <FormDescription>
+                <FormDescription className="text-center">
                   Vali amet, mille kohta soovid palgauuringut teha.
                 </FormDescription>
                 <FormMessage />

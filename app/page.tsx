@@ -6,7 +6,7 @@ export default function Home() {
     <div className="min-h-screen flex flex-col items-center justify-center p-8">
       <main className="text-center">
         <h1 className="text-4xl font-bold mb-6">
-          Äripaev Palgaruru Analüüs
+          Äripaev Palgaturu Analüüs
         </h1>
         <p className="text-lg mb-8">
           Leia oma ametile sobiv palk

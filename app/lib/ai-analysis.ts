@@ -56,7 +56,7 @@ ${metricsData}
 
 ###
 
-Provide a brief overview of salary dynamics, trends, and potential causes. Also provide some tips on how to improve your salary in this field. The response should be in Estonian and approximately 3-4 paragraphs long.`
+Provide a brief overview of salary dynamics, trends (do you see it growing or shrinking), and potential causes. Also provide some tips on how to improve your salary in this field. The response should be in Estonian and approximately 3-4 paragraphs long.`
 
     const completion = await openai.chat.completions.create({
       messages: [{ role: "user", content: prompt }],

@@ -2,6 +2,8 @@
 
 import { TrendingUp, TrendingDown, Percent, LucideIcon } from "lucide-react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { calculateSalaryMetrics, type SalaryMetric } from "@/app/lib/salary-calculations"
+import { cn } from "@/lib/utils"
 
 interface MetricCardProps {
   description: string
@@ -13,13 +15,23 @@ interface MetricCardProps {
     }
     period: string
   }
+  color: 'blue' | 'orange' | 'purple'
 }
 
-function MetricCard({ description, title, footer }: MetricCardProps) {
+function MetricCard({ description, title, footer, color }: MetricCardProps) {
   const TrendIcon = footer.trend.icon
 
+  const colorStyles = {
+    blue: 'bg-blue-100/80 dark:bg-blue-900/80 shadow-blue-300/50 dark:shadow-blue-800/50',
+    orange: 'bg-orange-100/80 dark:bg-orange-900/80 shadow-orange-300/50 dark:shadow-orange-800/50',
+    purple: 'bg-purple-100/80 dark:bg-purple-900/80 shadow-purple-300/50 dark:shadow-purple-800/50'
+  }
+
   return (
-    <Card>
+    <Card className={cn(
+      "shadow-lg transition-shadow hover:shadow-xl",
+      colorStyles[color]
+    )}>
       <CardHeader>
         <CardDescription>{description}</CardDescription>
         <CardTitle className="text-2xl font-semibold tabular-nums">
@@ -56,62 +68,18 @@ export function SalaryMetrics({ data }: SalaryMetricsProps) {
   const quarters = Object.values(data.dimension.Vaatlusperiood.category.label)
   const salaries = data.value
 
-  // Calculate metrics
-  const lastQuarter = salaries[salaries.length - 1]
-  const lastYearQuarter = salaries[salaries.length - 5]
-  const yoyGrowth = ((lastQuarter - lastYearQuarter) / lastYearQuarter) * 100
-  const yoyAbsolute = lastQuarter - lastYearQuarter
+  const { metrics } = calculateSalaryMetrics(quarters, salaries)
 
-  const inflationRate = 3.2
-
-  const quarterlyGrowthRates = []
-  for (let i = 1; i < salaries.length; i++) {
-    const growth = ((salaries[i] - salaries[i-1]) / salaries[i-1]) * 100
-    quarterlyGrowthRates.push(growth)
-  }
-  const avgQuarterlyGrowth = quarterlyGrowthRates.reduce((a, b) => a + b, 0) / quarterlyGrowthRates.length
-  const realGrowth = avgQuarterlyGrowth - inflationRate
-
-  const metrics: MetricCardProps[] = [
-    {
-      description: "Aastane kasv",
-      title: `${yoyAbsolute.toFixed(0)}€`,
-      footer: {
-        trend: {
-          icon: yoyGrowth > 0 ? TrendingUp : TrendingDown,
-          text: `${yoyGrowth > 0 ? "Kasvab" : "Langub"} ${yoyGrowth.toFixed(1)}% võrreldes eelmise aastaga`
-        },
-        period: `${quarters[quarters.length - 5]} vs ${quarters[quarters.length - 1]}`
-      }
-    },
-    {
-      description: "Keskmine kvartali kasv",
-      title: `${avgQuarterlyGrowth.toFixed(1)}%`,
-      footer: {
-        trend: {
-          icon: avgQuarterlyGrowth > 0 ? TrendingUp : TrendingDown,
-          text: `${avgQuarterlyGrowth > 0 ? "Stabiilne kasv" : "Langus"} ${avgQuarterlyGrowth.toFixed(1)}% kvartalite kaupa`
-        },
-        period: `${quarters.length} kvartali keskmine`
-      }
-    },
-    {
-      description: "Reaalne kasv",
-      title: `${realGrowth.toFixed(1)}%`,
-      footer: {
-        trend: {
-          icon: realGrowth > 0 ? TrendingUp : TrendingDown,
-          text: `${realGrowth > 0 ? "Positiivne" : "Negatiivne"} reaalne kasv (inflatsioon ${inflationRate}%)`
-        },
-        period: "Inflatsiooni arvestatud kasv"
-      }
-    }
-  ]
+  const colors: ('blue' | 'orange' | 'purple')[] = ['blue', 'orange', 'purple']
 
   return (
     <div className="grid grid-cols-3 gap-4 mt-8 w-[800px]">
       {metrics.map((metric, index) => (
-        <MetricCard key={index} {...metric} />
+        <MetricCard 
+          key={index} 
+          {...metric} 
+          color={colors[index]}
+        />
       ))}
     </div>
   )

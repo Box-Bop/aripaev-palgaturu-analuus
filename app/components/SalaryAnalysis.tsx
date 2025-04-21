@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { analyzeData } from "@/app/lib/ai-analysis"
+import { ColoredAnalysis } from "./ColoredAnalysis"
 
 interface SalaryAnalysisProps {
   data: {
@@ -59,11 +60,7 @@ export function SalaryAnalysis({ data }: SalaryAnalysisProps) {
             <div className="h-4 bg-muted rounded w-1/2"></div>
           </div>
         ) : (
-          <div className="prose prose-sm dark:prose-invert">
-            {analysis.split('\n').map((paragraph, index) => (
-              <p key={index}>{paragraph}</p>
-            ))}
-          </div>
+          <ColoredAnalysis text={analysis} />
         )}
       </CardContent>
     </Card>

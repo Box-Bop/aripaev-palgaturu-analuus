@@ -87,7 +87,10 @@ export function SalaryChart({ data }: SalaryChartProps) {
           config={chartConfig}
           className="aspect-[16/9] w-full"
         >
-          <AreaChart data={chartData}>
+          <AreaChart 
+            data={chartData}
+            margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
+          >
             <defs>
               <linearGradient id="salaryGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop

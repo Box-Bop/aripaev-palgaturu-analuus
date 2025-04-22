@@ -1,6 +1,6 @@
 import { TrendingUp, TrendingDown, LucideIcon } from "lucide-react"
 
-export interface SalaryMetric {
+interface SalaryMetric {
   description: string
   title: string
   footer: {
@@ -14,7 +14,7 @@ export interface SalaryMetric {
   percentage: number
 }
 
-export interface SalaryCalculations {
+interface SalaryCalculations {
   metrics: SalaryMetric[]
   yoyGrowth: number
   yoyAbsolute: number

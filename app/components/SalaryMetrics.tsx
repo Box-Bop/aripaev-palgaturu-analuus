@@ -1,8 +1,8 @@
 "use client"
 
-import { TrendingUp, TrendingDown, Percent, LucideIcon } from "lucide-react"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { calculateSalaryMetrics, type SalaryMetric } from "@/app/lib/salary-calculations"
+import { LucideIcon } from "lucide-react"
+import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { calculateSalaryMetrics } from "@/app/lib/salary-calculations"
 import { cn } from "@/lib/utils"
 
 interface MetricCardProps {

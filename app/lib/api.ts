@@ -1,30 +1,14 @@
-import { Job, StatisticsResponse } from "./types"
+import { Job, StatisticsResponse, CacheData, SalaryDataResponse } from "./types"
 
 const CACHE_KEY = 'statistics_raw_response_cache'
 const SALARY_CACHE_KEY = 'statistics_salary_cache'
 const CACHE_DURATION = 24 * 60 * 60 * 1000 // 24 hours
 
-interface CacheData {
-  timestamp: number
-  data: StatisticsResponse
-}
-
-interface SalaryCacheData {
-  timestamp: number
-  data: Record<string, any> // We'll type this properly later
-}
-
-interface SalaryCache {
-  [occupationCode: string]: SalaryCacheData
-}
-
 export async function fetchJobs(): Promise<Job[]> {
   const cachedData = localStorage.getItem(CACHE_KEY)
   if (cachedData) {
     const { timestamp, data }: CacheData = JSON.parse(cachedData)
-    const isExpired = Date.now() - timestamp > CACHE_DURATION
-    
-    if (!isExpired) {
+    if (Date.now() - timestamp <= CACHE_DURATION) {
       return processResponse(data)
     }
   }
@@ -43,22 +27,18 @@ export async function fetchJobs(): Promise<Job[]> {
   }
 
   const data: StatisticsResponse = await response.json()
-
-  const cacheData: CacheData = {
+  
+  localStorage.setItem(CACHE_KEY, JSON.stringify({
     timestamp: Date.now(),
-    data: data,
-  }
-  localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData))
+    data
+  }))
 
   return processResponse(data)
 }
 
 function processResponse(data: StatisticsResponse): Job[] {
   const tegevusala = data.variables.find(v => v.code === "Tegevusala")
-  
-  if (!tegevusala) {
-    throw new Error("Could not find Tegevusala data")
-  }
+  if (!tegevusala) throw new Error("Could not find Tegevusala data")
 
   return tegevusala.valueTexts.map((label, index) => ({
     label,
@@ -66,22 +46,17 @@ function processResponse(data: StatisticsResponse): Job[] {
   }))
 }
 
-export async function fetchSalaryData(occupationCode: string): Promise<any> {
-  // Try to get cached salary data
+export async function fetchSalaryData(occupationCode: string): Promise<SalaryDataResponse> {
   const cachedSalaries = localStorage.getItem(SALARY_CACHE_KEY)
   if (cachedSalaries) {
-    const salaryCache: SalaryCache = JSON.parse(cachedSalaries)
+    const salaryCache: Record<string, { timestamp: number, data: SalaryDataResponse }> = JSON.parse(cachedSalaries)
     const cachedData = salaryCache[occupationCode]
     
-    if (cachedData) {
-      const isExpired = Date.now() - cachedData.timestamp > CACHE_DURATION
-      if (!isExpired) {
-        return cachedData.data
-      }
+    if (cachedData && Date.now() - cachedData.timestamp <= CACHE_DURATION) {
+      return cachedData.data
     }
   }
 
-  // If no cache or expired, fetch new data
   const response = await fetch(
     "https://andmed.stat.ee/api/v1/et/stat/PA111",
     {
@@ -118,13 +93,12 @@ export async function fetchSalaryData(occupationCode: string): Promise<any> {
     throw new Error("Failed to fetch salary data")
   }
 
-  const data = await response.json()
-
-  // Update cache
-  const salaryCache: SalaryCache = cachedSalaries ? JSON.parse(cachedSalaries) : {}
+  const data: SalaryDataResponse = await response.json()
+  
+  const salaryCache = cachedSalaries ? JSON.parse(cachedSalaries) : {}
   salaryCache[occupationCode] = {
     timestamp: Date.now(),
-    data: data
+    data
   }
   localStorage.setItem(SALARY_CACHE_KEY, JSON.stringify(salaryCache))
 

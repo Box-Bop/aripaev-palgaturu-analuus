@@ -38,7 +38,7 @@ function MetricCard({ description, title, footer, color }: MetricCardProps) {
           {title}
         </CardTitle>
       </CardHeader>
-      <CardFooter className="flex-col items-start gap-1 text-sm">
+      <CardFooter className="flex-col items-center gap-1 text-sm">
         <div className="line-clamp-1 flex gap-2 font-medium">
           <TrendIcon className="size-4" />
           {footer.trend.text}
@@ -73,7 +73,7 @@ export function SalaryMetrics({ data }: SalaryMetricsProps) {
   const colors: ('blue' | 'orange' | 'purple')[] = ['blue', 'orange', 'purple']
 
   return (
-    <div className="grid grid-cols-3 gap-4 mt-8 w-[800px]">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
       {metrics.map((metric, index) => (
         <MetricCard 
           key={index} 

@@ -49,9 +49,9 @@ export function SalaryAnalysis({ data }: SalaryAnalysisProps) {
   }, [data])
 
   return (
-    <Card className="mt-8 w-[800px]">
+    <Card className="mt-8">
       <CardHeader>
-        <CardTitle>AI Analüüs</CardTitle>
+        <CardTitle className="text-xl sm:text-2xl">AI Analüüs</CardTitle>
       </CardHeader>
       <CardContent>
         {isLoading ? (

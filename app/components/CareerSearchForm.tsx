@@ -86,7 +86,7 @@ export function JobCombobox() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full max-w-[800px] mx-auto">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <FormField
@@ -161,11 +161,11 @@ export function JobCombobox() {
         </form>
       </Form>
       {salaryData && (
-        <>
+        <div className="space-y-6">
           <SalaryChart data={salaryData} />
           <SalaryAnalysis data={salaryData} />
           <SalaryMetrics data={salaryData} />
-        </>
+        </div>
       )}
     </div>
   )

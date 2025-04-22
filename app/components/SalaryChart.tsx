@@ -75,17 +75,17 @@ export function SalaryChart({ data }: SalaryChartProps) {
   } satisfies ChartConfig
 
   return (
-    <Card className="mt-8 w-[800px]">
+    <Card className="mt-8">
       <CardHeader>
-        <CardTitle>{occupationName}</CardTitle>
+        <CardTitle className="text-xl sm:text-2xl break-words">{occupationName}</CardTitle>
         <CardDescription>
           Andmed ajavahemikul {firstQuarter} kuni {lastQuarter}
         </CardDescription>
       </CardHeader>
-      <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
+      <CardContent>
         <ChartContainer
           config={chartConfig}
-          className="aspect-auto h-[250px] w-full"
+          className="aspect-[16/9] w-full"
         >
           <AreaChart data={chartData}>
             <defs>
